@@ -1,0 +1,223 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Bender — Drafting Studio design system (mirrors the main app's
+   app/globals.css so the waitlist is visually indistinguishable).
+   Light only. Pure-white paper, deep cobalt ink-blue primary,
+   one rationed warm clay accent, hairline grid, flat depth.
+   OKLCH throughout. No gradients, no glass, no glow.
+   ============================================================ */
+
+:root {
+  /* ── surfaces: paper ── */
+  --bg:            oklch(1.000 0.000 0);      /* pure white drafting paper */
+  --surface:       oklch(0.976 0.004 245);    /* panels, cards */
+  --surface-sunk:  oklch(0.958 0.005 245);    /* wells, insets, hover */
+
+  /* ── ink ramp: cool near-black (darkened a step for readability) ── */
+  --ink:           oklch(0.235 0.022 250);    /* body + headings (~12:1 on bg) */
+  --ink-muted:     oklch(0.430 0.018 250);    /* secondary text (~7:1) */
+  --ink-faint:     oklch(0.555 0.014 250);    /* tertiary / small annotations (~4.6:1) */
+
+  /* ── primary: deep cobalt ink-blue ── */
+  --primary:       oklch(0.480 0.130 240);
+  --primary-hover: oklch(0.430 0.135 240);
+  --primary-press: oklch(0.390 0.130 240);
+  --primary-weak:  oklch(0.955 0.020 240);
+  --on-primary:    oklch(0.995 0.000 0);
+
+  /* ── accent: warm clay (rationed, ≤10%) ── */
+  --clay:          oklch(0.680 0.130 55);
+  --clay-weak:     oklch(0.960 0.022 60);
+  --on-clay:       oklch(0.995 0.000 0);
+
+  /* ── hairlines: the drafting grid ── */
+  --border-subtle: oklch(0.930 0.004 245);
+  --border-base:   oklch(0.890 0.005 245);
+  --border-strong: oklch(0.830 0.006 245);
+
+  /* ── focus ── */
+  --ring-color:    oklch(0.480 0.130 240);
+
+  /* ── semantic state ── */
+  --success:       oklch(0.560 0.130 150);
+  --success-weak:  oklch(0.960 0.030 150);
+  --warning:       oklch(0.720 0.140 75);
+  --danger:        oklch(0.560 0.180 25);
+  --danger-weak:   oklch(0.960 0.030 25);
+
+  /* ── elevation: flat by default; depth via hairlines ── */
+  --shadow-sm:     0 1px 2px oklch(0.26 0.02 250 / 0.06);
+  --shadow-md:     0 8px 24px oklch(0.26 0.02 250 / 0.10);
+
+  /* ── focus glow: cobalt ring for active inputs ── */
+  --glow-primary:      0 0 0 3px oklch(0.480 0.130 240 / 0.18);
+  --glow-primary-soft: 0 0 0 2px oklch(0.480 0.130 240 / 0.12);
+
+  /* ── motion ── */
+  --ease-out:      cubic-bezier(0.22, 1, 0.36, 1);
+
+  --radius:        0.625rem;
+}
+
+@theme inline {
+  /* brand tokens — bg-surface, text-ink, border-border-subtle, ... */
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-sunk: var(--surface-sunk);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-press: var(--primary-press);
+  --color-primary-weak: var(--primary-weak);
+  --color-on-primary: var(--on-primary);
+  --color-clay: var(--clay);
+  --color-clay-weak: var(--clay-weak);
+  --color-on-clay: var(--on-clay);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-base: var(--border-base);
+  --color-border-strong: var(--border-strong);
+  --color-success: var(--success);
+  --color-success-weak: var(--success-weak);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-danger-weak: var(--danger-weak);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-display: var(--font-display);
+
+  --ease-out: var(--ease-out);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  html {
+    background-color: var(--bg);
+    color-scheme: light;
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    /* Inter variable axis: sit a step above regular so body copy never
+       reads thin on the white paper surface. */
+    font-weight: 460;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--primary);
+    color: var(--on-primary);
+  }
+
+  :where(a, button, input, [tabindex]):focus-visible {
+    outline: 2px solid var(--ring-color);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .font-mono {
+    font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  /* Hairline divider — the drafting rule. */
+  .hairline {
+    height: 1px;
+    background-color: var(--border-subtle);
+  }
+
+  .shadow-card { box-shadow: var(--shadow-sm); }
+  .shadow-pop  { box-shadow: var(--shadow-md); }
+}
+
+/* Calm, single-purpose entrance for first-load reveals. */
+@keyframes rise {
+  0%   { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Mascot life ── */
+@keyframes bot-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+@keyframes bot-blink {
+  0%, 91%, 100% { transform: scaleY(1); }
+  94%, 97%      { transform: scaleY(0.08); }
+}
+@keyframes bot-wave {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-22deg); }
+  55%      { transform: rotate(14deg); }
+  80%      { transform: rotate(-10deg); }
+}
+@keyframes bot-antenna {
+  0%, 100% { transform: rotate(-6deg); }
+  50%      { transform: rotate(8deg); }
+}
+
+/* ── Demo player ── */
+@keyframes caret-blink {
+  0%, 55% { opacity: 1; }
+  56%, 100% { opacity: 0; }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer {
+  background: linear-gradient(
+    100deg,
+    var(--surface-sunk) 38%,
+    oklch(0.985 0.003 245) 50%,
+    var(--surface-sunk) 62%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+.rise {
+  animation: rise 0.7s var(--ease-out) both;
+  animation-delay: var(--rise-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

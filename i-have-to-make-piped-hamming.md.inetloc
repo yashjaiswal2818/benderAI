@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>URL</key>
+	<string>vscode-webview://1t196jrl06ct0thrhjrnvu9iimqp5bulkqb0c447ijidvkf290pu/index.html?id=931a1708-9523-4858-b39a-95eea80613ee&amp;origin=00dce6f7-24c5-4b58-9993-0e4c2d012cc5&amp;swVersion=4&amp;extensionId=Anthropic.claude-code&amp;platform=electron&amp;vscode-resource-base-authority=vscode-resource.vscode-cdn.net&amp;parentOrigin=vscode-file%3A%2F%2Fvscode-app&amp;session=cd431fa9-da5b-4d30-9dd7-c25eb9296f48#</string>
+</dict>
+</plist>
