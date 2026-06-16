@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: "Bender",
-  url: process.env.NEXT_PUBLIC_APP_URL ?? "https://bender.app",
+  url: process.env.NEXT_PUBLIC_APP_URL ?? "https://waitlist.benderai.app",
   description:
     "Describe your app. Get real screens to ship. Bender turns a prompt into themed mobile screens you can edit by chat and export as clean code.",
 
