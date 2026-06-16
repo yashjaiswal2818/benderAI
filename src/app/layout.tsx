@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Inter, IBM_Plex_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Analytics } from "@vercel/analytics/next";
 import { siteConfig } from "@/lib/config";
 import "./globals.css";
 
@@ -62,6 +63,7 @@ export default function RootLayout({
           className={`${fontSans.variable} ${fontDisplay.variable} ${fontMono.variable} antialiased`}
         >
           {children}
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
