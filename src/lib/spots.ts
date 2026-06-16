@@ -32,22 +32,47 @@ export async function getSpots(): Promise<Spots> {
 
   if (token && productId) {
     try {
-      const res = await fetch(
-        `${polarBase()}/v1/orders/?product_id=${encodeURIComponent(productId)}&limit=1`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          next: { revalidate: 60 },
+      // Count UNIQUE customers, not raw orders. A one-time product can be
+      // bought more than once by the same person (Polar doesn't block it), and
+      // a double-purchase — or our own test orders — must not burn two of the
+      // 100 founding spots. Page through the orders and dedupe by customer.
+      // The 100-spot cap keeps this to ~1-2 pages in practice.
+      const customers = new Set<string>();
+      const MAX_PAGES = 10; // 1,000 orders — far beyond the 100-spot cap
+      for (let page = 1; page <= MAX_PAGES; page++) {
+        const res = await fetch(
+          `${polarBase()}/v1/orders/?product_id=${encodeURIComponent(
+            productId
+          )}&limit=100&page=${page}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            next: { revalidate: 60 },
+          }
+        );
+        if (!res.ok) {
+          // First page failed → give up, use the manual fallback. A later page
+          // failing → keep the customers already counted.
+          if (page === 1) throw new Error(`Polar orders HTTP ${res.status}`);
+          break;
         }
-      );
-      if (res.ok) {
         const data = (await res.json()) as {
-          pagination?: { total_count?: number };
+          items?: Array<{
+            customer_id?: string;
+            customer?: { id?: string; email?: string };
+          }>;
+          pagination?: { max_page?: number };
         };
-        if (typeof data.pagination?.total_count === "number") {
-          claimed = data.pagination.total_count;
-          source = "polar";
+        const items = data.items ?? [];
+        for (const order of items) {
+          const key =
+            order.customer_id ?? order.customer?.id ?? order.customer?.email;
+          if (key) customers.add(key);
         }
+        const maxPage = data.pagination?.max_page ?? page;
+        if (items.length < 100 || page >= maxPage) break;
       }
+      claimed = customers.size;
+      source = "polar";
     } catch {
       // keep the manual fallback
     }

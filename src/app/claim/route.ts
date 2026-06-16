@@ -32,6 +32,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(`${origin}/?soldout=1`);
   }
 
+  // Don't let someone who already owns lifetime pay a second time. Polar won't
+  // stop a repeat checkout, so we guard here. Fails OPEN: if the entitlement
+  // service is unconfigured or unreachable, we proceed to checkout rather than
+  // block a legitimate buyer.
+  if (await alreadyOwnsLifetime(userId)) {
+    return NextResponse.redirect(`${origin}/?owned=1`);
+  }
+
   const base = process.env.NEXT_PUBLIC_POLAR_LIFETIME_CHECKOUT_URL;
   if (!base) {
     console.error("[claim] NEXT_PUBLIC_POLAR_LIFETIME_CHECKOUT_URL is not set");
@@ -50,4 +58,39 @@ export async function GET(req: NextRequest) {
   if (email) params.set("customer_email", email);
 
   return NextResponse.redirect(`${base}?${params.toString()}`);
+}
+
+/**
+ * Asks the main app whether this Clerk user already has lifetime access, so we
+ * never send an existing owner back through checkout.
+ *
+ * Configured via ENTITLEMENT_CHECK_URL (e.g. https://benderai.app/api/
+ * entitlement) and an optional ENTITLEMENT_CHECK_SECRET bearer token. The
+ * endpoint is expected to accept ?clerk_user_id=… and return JSON shaped like
+ * { tier: "LIFETIME" | "PRO" | "FREE", lifetime?: boolean }.
+ *
+ * Fails OPEN on every uncertainty (unset URL, non-200, timeout, bad JSON):
+ * blocking a paying customer is far worse than the rare duplicate charge this
+ * guards against.
+ */
+async function alreadyOwnsLifetime(userId: string): Promise<boolean> {
+  const url = process.env.ENTITLEMENT_CHECK_URL;
+  if (!url) return false;
+
+  try {
+    const secret = process.env.ENTITLEMENT_CHECK_SECRET;
+    const res = await fetch(
+      `${url}?clerk_user_id=${encodeURIComponent(userId)}`,
+      {
+        headers: secret ? { Authorization: `Bearer ${secret}` } : undefined,
+        cache: "no-store",
+        signal: AbortSignal.timeout(3000),
+      }
+    );
+    if (!res.ok) return false;
+    const data = (await res.json()) as { tier?: string; lifetime?: boolean };
+    return data.lifetime === true || data.tier === "LIFETIME";
+  } catch {
+    return false;
+  }
 }

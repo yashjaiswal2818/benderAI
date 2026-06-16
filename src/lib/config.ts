@@ -32,7 +32,7 @@ export const siteConfig = {
 
   social: {
     x: "https://x.com/yashjaiswal28_",
-    email: "hey@bender.app",
+    email: "hey@benderai.app",
   },
 } as const;
 
