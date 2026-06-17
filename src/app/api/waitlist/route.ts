@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server"
+import { rateLimit, clientIp } from "@/lib/rate-limit"
 
 export const runtime = "nodejs"
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+// A waitlist signup is tiny JSON; anything larger is junk or abuse.
+const MAX_BODY_BYTES = 1024
 
 /**
  * Adds an email to the Bender launch list as a Resend contact.
@@ -14,6 +18,27 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
  * configured" error in production.
  */
 export async function POST(req: Request) {
+  // Throttle per IP: this is the only public write endpoint, so without a
+  // limit it can be used to exhaust the Resend quota or to probe which emails
+  // are already on the list (the "already" response is an enumeration oracle).
+  const rl = rateLimit(`waitlist:${clientIp(req)}`, { limit: 5, windowMs: 60_000 })
+  if (!rl.ok) {
+    return NextResponse.json(
+      { ok: false, error: "Too many requests. Please wait a moment and try again." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfter) } }
+    )
+  }
+
+  // Reject oversized bodies up front (defense in depth; the email length is
+  // also capped below).
+  const declaredLength = Number(req.headers.get("content-length") ?? 0)
+  if (declaredLength > MAX_BODY_BYTES) {
+    return NextResponse.json(
+      { ok: false, error: "Invalid request." },
+      { status: 413 }
+    )
+  }
+
   let email = ""
   try {
     const body = await req.json()
