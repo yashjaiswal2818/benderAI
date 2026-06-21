@@ -15,28 +15,18 @@ const claimClasses = (size: "md" | "lg") =>
 /**
  * The primary CTA. Signed out: opens the Clerk sign-up modal, and after
  * sign-up Clerk forwards to /claim, which sends the new account straight to
- * the Polar checkout. Signed in: /claim directly. Sold out: disabled with
- * an explanation, pointing at the free list.
+ * the $5 Polar checkout. Signed in: /claim directly. The waitlist is open, so
+ * there's no sold-out state.
  */
 export function ClaimButton({
-  soldOut,
   size = "lg",
   label,
 }: {
-  soldOut: boolean;
   size?: "md" | "lg";
   label?: string;
 }) {
   const { isSignedIn } = useUser();
-  const text = label ?? `Claim the lifetime deal · $${siteConfig.offer.price}`;
-
-  if (soldOut) {
-    return (
-      <button type="button" disabled className={cn(claimClasses(size), "opacity-55")}>
-        All 100 spots claimed
-      </button>
-    );
-  }
+  const text = label ?? `Join the waitlist · $${siteConfig.waitlist.joinPrice}`;
 
   if (isSignedIn) {
     return (

@@ -1,69 +1,81 @@
 # Bender — waitlist
 
-Pre-launch waitlist landing page for **Bender**, an AI tool that turns a
+Pre-launch **paid waitlist** for **Bender**, an AI tool that turns a
 plain-English prompt into production React Native mobile screens.
 
+The model: **$5 once to join the waitlist.** It's a non-refundable commitment
+fee (not a deposit) — paying is the signal of genuine intent, so there's no
+free email list. In return, members lock in Bender Pro yearly at **$12/yr**
+(vs **$15** for everyone else) at launch.
+
 Built with Next.js 16 (App Router), React 19, Tailwind v4, `motion`,
-`@number-flow/react`, and `lucide-react`. Design system and intent live in
-[DESIGN.md](DESIGN.md) and [PRODUCT.md](PRODUCT.md).
+`@number-flow/react`, and `lucide-react`. Auth is Clerk; payment is Polar.
+Design and intent live in [DESIGN.md](DESIGN.md) and [PRODUCT.md](PRODUCT.md).
 
 ## Run it
 
 ```bash
 npm install
-npm run dev          # http://localhost:3000
+cp .env.example .env.local   # then fill in the values below
+npm run dev                  # http://localhost:3000
 ```
 
-The signup form works immediately: with no API key set, the route accepts
-emails in development so you can test the full flow.
+## Go live
 
-## Go live (3 things)
+1. **Clerk.** Set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`
+   (use the same instance as the main app so buyers become real accounts).
 
-1. **Connect Loops.** Copy `.env.example` to `.env.local` and paste your key:
+2. **Polar — create the $5 product.** Run the helper, which creates the one-time
+   $5 "Waitlist" product + checkout link and writes the two env vars for you:
 
    ```bash
-   cp .env.example .env.local
-   # LOOPS_API_KEY=your_key_here
+   node scripts/setup-polar.mjs
    ```
 
-   Get it from Loops → Settings → API. Signups are added to the `Waitlist`
-   user group via `POST app.loops.so/api/v1/contacts/create`. Restart `npm run dev`.
+   It sets `NEXT_PUBLIC_POLAR_WAITLIST_CHECKOUT_URL` and
+   `POLAR_WAITLIST_PRODUCT_ID`. (`/claim` appends `clerk_user_id` +
+   `success_url` automatically.) Until these are set, `/claim` safely shows
+   "checkout unavailable" — it never charges.
 
-2. **Update the spot counter daily.** In [`src/lib/config.ts`](src/lib/config.ts),
-   bump `spotsClaimed`. Update it by hand every morning, even on slow days — a
-   real number reads as momentum (12 looks honest, 47 looks like a line out the
-   door). Never leave it at 0. `spotsTotal` is the founding cap.
+3. **The "joined" counter.** With `POLAR_ACCESS_TOKEN` +
+   `POLAR_WAITLIST_PRODUCT_ID` set, the counter is live (unique paying
+   customers, cached 60s). Otherwise it shows `waitlist.joinedManual` from
+   [`src/lib/config.ts`](src/lib/config.ts) — bump that by hand on slow days so
+   the number always reads as real.
 
-3. **Swap in the real demo video.** Drop a screen recording at `public/demo.mp4`
-   and set `demoVideoSrc: "/demo.mp4"` in `config.ts`. Until then the demo shows
-   the live "type a prompt → generate a screen" animation as a placeholder.
+Pricing and copy knobs all live in `siteConfig.waitlist` in
+[`src/lib/config.ts`](src/lib/config.ts): `joinPrice`, `yearlyNormal`,
+`yearlyMember`, `joinedManual`, `creditsPerMonth`.
 
-Other knobs in `config.ts`: the founding price (`offer.priceNow` / `priceLater`),
-your Polar checkout link (`offer.checkoutUrl`, used in the launch email), and
-social links.
+> **Discount enforcement is the main app's job.** This site collects the $5 and
+> ties it to a `clerk_user_id` (+ email) via Polar. At launch, the main app
+> must read who paid and apply the $12/yr price. This repo only makes the
+> promise; it can't enforce pricing.
 
 ## Structure
 
 ```
 src/
+  proxy.ts                  Clerk middleware + Content-Security-Policy
   app/
-    layout.tsx              fonts (Bricolage + Geist), metadata
-    page.tsx                section order: hero → demo → problem → features → outputs → offer → faq
-    globals.css             design tokens (@theme), reveal + marquee CSS
-    api/waitlist/route.ts   Loops integration (+ dev fallback)
+    layout.tsx              fonts, metadata, ClerkProvider
+    page.tsx                hero → demo → showcase → $5 offer
+    claim/page.tsx          auth-gated → $5 Polar checkout redirect
+    api/spots/route.ts      live "X joined" count (JSON)
   components/
-    sections/               one file per page section
-    screens.tsx             the six generated app mockups (pure CSS/SVG)
-    phone.tsx               scalable device frame
-    hero-visual.tsx         prompt → generate → morph animation
-    waitlist-form.tsx       form with idle/loading/success/error states
-    spot-counter.tsx        animated counter + progress
-    ui/                     button, container, expandable-screen (cult-ui, hardened)
-  lib/config.ts             all the launch knobs
+    claim-button.tsx        primary CTA (sign-up → /claim)
+    joined-meter.tsx        animated "X builders joined" social proof
+    status-banner.tsx       post-checkout / sign-in query-flag messaging
+    site-header.tsx, showcase/, bender-bot.tsx, demo-*.tsx, dot-field.tsx
+  lib/
+    config.ts               all the launch knobs (siteConfig.waitlist)
+    spots.ts                getJoinedCount() — counts paid Polar orders
+scripts/setup-polar.mjs     one-shot $5 product + checkout-link creator
 ```
 
 ## Deploy
 
-Any Next.js host (Vercel recommended). Set `LOOPS_API_KEY` in the host's
-environment. The dev-only local fallback is disabled in production, so the key
-is required for live signups.
+Any Next.js host (Vercel recommended). Set the same env vars in the host's
+environment — `.env.local` does **not** deploy. Security headers live in
+[`next.config.ts`](next.config.ts); the CSP lives in
+[`src/proxy.ts`](src/proxy.ts).

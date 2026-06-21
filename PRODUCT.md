@@ -15,9 +15,11 @@ and they are shopping for speed without giving up control of their design system
 
 Bender turns a plain-English prompt into production React Native (Expo) screens,
 generated with the parts people normally skip: loading, empty, error, and dark
-states, themed to the user's own tokens. This site is the pre-launch waitlist:
-its job is to make a visitor understand what Bender does (by showing real output,
-not claiming), then convert them into a founding member before launch.
+states, themed to the user's own tokens. This site is the pre-launch *paid*
+waitlist: its job is to make a visitor understand what Bender does (by showing
+real output, not claiming), then convert them into a paying waitlist member —
+$5 once to join, which locks in a permanently cheaper yearly price ($12/yr vs
+$15) at launch. No free email list: paying $5 is the signal of genuine intent.
 
 ## Brand Personality
 
@@ -38,7 +40,7 @@ Specific over aspirational. The emotion to evoke: "oh, it actually does the bori
 - **Show the output.** Every claim is backed by a real, rendered mobile screen on the page. The product demonstrates itself.
 - **One loud signature.** Black and white do the work; electric green is the single memorable color. Restraint everywhere else so the green and the screens pop.
 - **Motion that proves the product.** The hero literally types a prompt and generates a screen. Animation is a demo, not decoration.
-- **Honest scarcity.** The spot counter is a real number the owner updates by hand. Momentum, not fake live tickers.
+- **Honest momentum.** The "X builders joined" counter is a real number — live from paid Polar orders, or a hand-updated fallback. Momentum, not fake live tickers. The waitlist is open (no cap), so this is social proof, not scarcity.
 - **Name the work.** Copy describes what Bender literally does ("loading, empty, error states") instead of adjectives.
 
 ## Accessibility & Inclusion

@@ -1,10 +1,8 @@
 import { siteConfig } from "@/lib/config";
 
-export type Spots = {
-  claimed: number;
-  total: number;
-  left: number;
-  soldOut: boolean;
+export type JoinedCount = {
+  /** How many people have paid the $5 to join the waitlist. */
+  joined: number;
   /** "polar" when counted live from paid orders, "manual" otherwise. */
   source: "polar" | "manual";
 };
@@ -16,29 +14,28 @@ function polarBase() {
 }
 
 /**
- * How many of the 100 founding spots are gone.
+ * How many people have joined the paid waitlist.
  *
- * Live mode: counts paid Polar orders for the lifetime product (cached for
- * 60s). Fallback: the hand-updated number in config. Any Polar error falls
- * back too — the page must never break because the counter can't load.
+ * Live mode: counts UNIQUE paying customers of the $5 waitlist product
+ * (cached for 60s). Fallback: the hand-updated number in config. Any Polar
+ * error falls back too — the page must never break because the counter can't
+ * load. The waitlist is open (no cap), so this is pure social proof.
  */
-export async function getSpots(): Promise<Spots> {
-  const total = siteConfig.offer.spotsTotal;
+export async function getJoinedCount(): Promise<JoinedCount> {
   const token = process.env.POLAR_ACCESS_TOKEN;
-  const productId = process.env.POLAR_LIFETIME_PRODUCT_ID;
+  const productId = process.env.POLAR_WAITLIST_PRODUCT_ID;
 
-  let claimed: number = siteConfig.offer.spotsClaimedManual;
-  let source: Spots["source"] = "manual";
+  let joined: number = siteConfig.waitlist.joinedManual;
+  let source: JoinedCount["source"] = "manual";
 
   if (token && productId) {
     try {
-      // Count UNIQUE customers, not raw orders. A one-time product can be
-      // bought more than once by the same person (Polar doesn't block it), and
-      // a double-purchase — or our own test orders — must not burn two of the
-      // 100 founding spots. Page through the orders and dedupe by customer.
-      // The 100-spot cap keeps this to ~1-2 pages in practice.
+      // Count UNIQUE customers, not raw orders: a one-time product can be
+      // bought more than once by the same person (Polar doesn't block it),
+      // and a repeat purchase shouldn't inflate the count. Page through the
+      // orders and dedupe by customer.
       const customers = new Set<string>();
-      const MAX_PAGES = 10; // 1,000 orders — far beyond the 100-spot cap
+      const MAX_PAGES = 50; // 5,000 orders, a generous ceiling
       for (let page = 1; page <= MAX_PAGES; page++) {
         const res = await fetch(
           `${polarBase()}/v1/orders/?product_id=${encodeURIComponent(
@@ -71,19 +68,12 @@ export async function getSpots(): Promise<Spots> {
         const maxPage = data.pagination?.max_page ?? page;
         if (items.length < 100 || page >= maxPage) break;
       }
-      claimed = customers.size;
+      joined = customers.size;
       source = "polar";
     } catch {
       // keep the manual fallback
     }
   }
 
-  claimed = Math.max(0, Math.min(claimed, total));
-  return {
-    claimed,
-    total,
-    left: total - claimed,
-    soldOut: claimed >= total,
-    source,
-  };
+  return { joined: Math.max(0, joined), source };
 }

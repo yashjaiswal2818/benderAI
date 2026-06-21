@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -rniE '\\\\$?49|lifetime|founding|founder|first 100|notify me|free list|resend' README.md plan.md DESIGN.md)",
+      "Bash(grep -rniE 'lifetime|founding|founder|sold ?out|\\\\$49|notify|free list|resend|\\\\.price\\\\b' src/ --include='*.ts' --include='*.tsx')"
+    ]
+  }
+}

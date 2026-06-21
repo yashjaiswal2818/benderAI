@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { getSpots } from "@/lib/spots";
+import { getJoinedCount } from "@/lib/spots";
 
 export const runtime = "nodejs";
 
-/** Live "X of 100 claimed" data for the founding-deal counter. */
+/** Live "X people joined" data for the waitlist counter. */
 export async function GET() {
-  const spots = await getSpots();
-  return NextResponse.json(spots, {
+  const count = await getJoinedCount();
+  return NextResponse.json(count, {
     headers: { "Cache-Control": "public, max-age=30, stale-while-revalidate=60" },
   });
 }

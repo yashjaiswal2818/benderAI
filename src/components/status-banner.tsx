@@ -4,14 +4,13 @@ import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useClerk } from "@clerk/nextjs";
 import { PartyPopper } from "lucide-react";
+import { siteConfig } from "@/lib/config";
 
 /**
  * Reacts to the query flags the claim flow leaves behind:
- *  ?claimed=1   — back from a successful Polar checkout → "You're in."
- *  ?owned=1     — clicked claim while already owning lifetime → "You already
- *                 have it." (guards against paying twice.)
+ *  ?claimed=1   — back from a successful $5 Polar checkout → "You're in."
+ *  ?owned=1     — clicked join while already a member → "You're already in."
  *  ?signin=1    — hit /claim signed out → auto-open the sign-in modal.
- *  ?soldout=1   — tried to claim after the cap → handled by page copy.
  *  ?checkout=unavailable — checkout link not configured yet.
  *
  * Must be rendered inside <Suspense> (uses useSearchParams).
@@ -40,11 +39,11 @@ export function StatusBanner() {
         </span>
         <div>
           <p className="font-display text-[15px] font-semibold text-ink">
-            You&rsquo;re in. Spot locked.
+            You&rsquo;re on the waitlist.
           </p>
           <p className="mt-0.5 text-[13px] leading-[1.5] text-ink-muted">
-            Your account has lifetime Pro from day one. We&rsquo;ll email you
-            the moment Bender opens, about a week from now.
+            Your ${siteConfig.waitlist.yearlyMember}/yr price is locked in. We&rsquo;ll
+            email you the moment Bender opens, about a week from now.
           </p>
         </div>
       </div>
@@ -62,11 +61,11 @@ export function StatusBanner() {
         </span>
         <div>
           <p className="font-display text-[15px] font-semibold text-ink">
-            You already have it.
+            You&rsquo;re already in.
           </p>
           <p className="mt-0.5 text-[13px] leading-[1.5] text-ink-muted">
-            Your account already has lifetime access &mdash; no need to pay
-            again. We&rsquo;ll email you the moment Bender opens.
+            You&rsquo;ve already joined the waitlist &mdash; no need to pay again.
+            We&rsquo;ll email you the moment Bender opens.
           </p>
         </div>
       </div>
@@ -79,8 +78,7 @@ export function StatusBanner() {
         role="status"
         className="rise mx-auto mb-8 w-full max-w-md rounded-xl border border-border-subtle bg-surface px-5 py-3 text-[13px] text-ink-muted"
       >
-        Checkout opens shortly. Join the free list below and we&rsquo;ll email
-        you the working link.
+        Checkout opens shortly. Check back in a little while to grab your spot.
       </p>
     );
   }

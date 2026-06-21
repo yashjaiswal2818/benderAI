@@ -51,7 +51,7 @@ export function SiteHeader() {
               href="#claim"
               className="inline-flex h-9 items-center gap-1.5 rounded-full bg-primary px-4 text-[13px] font-semibold text-on-primary transition-colors hover:bg-primary-press"
             >
-              Claim $49 lifetime
+              Join for $5
               <ArrowRight className="size-3.5" strokeWidth={2.25} />
             </a>
           </div>

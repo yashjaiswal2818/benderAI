@@ -1,17 +1,17 @@
 /**
- * One-shot Polar setup for the $49 lifetime deal.
+ * One-shot Polar setup for the $5 waitlist deal.
  *
  * Reads POLAR_ACCESS_TOKEN + POLAR_SERVER from .env.local, then:
- *   1. finds or creates the one-time $49 "Bender — Lifetime" product
+ *   1. finds or creates the one-time $5 "Bender — Waitlist" product
  *   2. finds or creates a checkout link for it
- *   3. writes POLAR_LIFETIME_PRODUCT_ID and
- *      NEXT_PUBLIC_POLAR_LIFETIME_CHECKOUT_URL back into .env.local
+ *   3. writes POLAR_WAITLIST_PRODUCT_ID and
+ *      NEXT_PUBLIC_POLAR_WAITLIST_CHECKOUT_URL back into .env.local
  *
  * Usage:  node scripts/setup-polar.mjs
  *
  * Token scopes needed: products:read, products:write,
  * checkout_links:read, checkout_links:write, orders:read
- * (orders:read is what the live spot counter uses at runtime).
+ * (orders:read is what the live "joined" counter uses at runtime).
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -19,11 +19,12 @@ import { dirname, join } from "node:path";
 
 const ENV_PATH = join(dirname(fileURLToPath(import.meta.url)), "..", ".env.local");
 
-const PRODUCT_NAME = "Bender — Lifetime (First 100)";
+const PRODUCT_NAME = "Bender — Waitlist";
 const PRODUCT_DESCRIPTION =
-  "Lifetime access to Bender Pro for the first 100 founding members. " +
-  "One-time $49. Includes 500 credits per month, resetting monthly.";
-const PRICE_USD_CENTS = 4900;
+  "One-time $5 fee to join the Bender waitlist. Locks in Bender Pro yearly " +
+  "at $12/year (vs $15) for as long as you stay subscribed. Non-refundable " +
+  "commitment fee, not a deposit.";
+const PRICE_USD_CENTS = 500;
 
 function loadEnv() {
   const raw = readFileSync(ENV_PATH, "utf8");
@@ -91,7 +92,7 @@ ${err.message}`);
 }
 
 // 2. Find or create the product.
-const existing = await polar(`/v1/products/?query=${encodeURIComponent("Lifetime")}&is_archived=false&limit=20`);
+const existing = await polar(`/v1/products/?query=${encodeURIComponent("Waitlist")}&is_archived=false&limit=20`);
 let product = (existing.items ?? []).find((p) => p.name === PRODUCT_NAME);
 
 if (product) {
@@ -121,7 +122,7 @@ if (link) {
     body: JSON.stringify({
       payment_processor: "stripe",
       products: [product.id],
-      label: "Waitlist — $49 lifetime deal",
+      label: "Waitlist — $5 join",
       success_url: `${appUrl}/?claimed=1`,
       allow_discount_codes: false,
     }),
@@ -131,14 +132,14 @@ if (link) {
 
 // 4. Write the results back into .env.local.
 saveEnv(raw, {
-  POLAR_LIFETIME_PRODUCT_ID: product.id,
-  NEXT_PUBLIC_POLAR_LIFETIME_CHECKOUT_URL: link.url,
+  POLAR_WAITLIST_PRODUCT_ID: product.id,
+  NEXT_PUBLIC_POLAR_WAITLIST_CHECKOUT_URL: link.url,
 });
 
 console.log(`
 ✓ .env.local updated:
-  POLAR_LIFETIME_PRODUCT_ID=${product.id}
-  NEXT_PUBLIC_POLAR_LIFETIME_CHECKOUT_URL=${link.url}
+  POLAR_WAITLIST_PRODUCT_ID=${product.id}
+  NEXT_PUBLIC_POLAR_WAITLIST_CHECKOUT_URL=${link.url}
 
 Environment: ${server} (${api})
 Restart \`npm run dev\` to pick up the new values.`);

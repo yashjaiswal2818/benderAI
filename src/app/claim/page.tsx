@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { getSpots } from "@/lib/spots";
 import { siteConfig } from "@/lib/config";
 import { ClaimRedirect } from "./claim-redirect";
 
@@ -8,7 +7,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * The one canonical path to the $49 lifetime checkout.
+ * The one canonical path to the $5 waitlist checkout.
  *
  * This is a PAGE (not a route handler) on purpose. The final hop is a
  * cross-origin redirect to Polar, and a server 307 can't be followed by Next's
@@ -18,26 +17,24 @@ export const dynamic = "force-dynamic";
  * which works no matter how the user reached /claim (Link click, Clerk
  * post-signup redirect, or a direct hit).
  *
- * We pass two things on the checkout URL:
+ * We pass two things on the checkout URL so the main app can recognise this
+ * person as a paid member later and apply their locked-in yearly price:
  *  - clerk_user_id: prefills the Polar `clerk_user_id` custom field (the
- *    primary, email-agnostic way the webhook resolves the buyer).
- *  - customer_email: prefills the email so the webhook's email fallback also
- *    resolves correctly. Belt and suspenders.
+ *    primary, email-agnostic way the buyer is resolved).
+ *  - customer_email: prefills the email so the email fallback also resolves.
+ *    Belt and suspenders.
  */
 export default async function ClaimPage() {
   const { userId } = await auth();
   if (!userId) redirect("/?signin=1");
 
-  const spots = await getSpots();
-  if (spots.soldOut) redirect("/?soldout=1");
+  // Don't let someone who already joined pay the $5 twice. Polar won't stop a
+  // repeat checkout, so we guard here. Fails open (see helper).
+  if (await alreadyJoined(userId)) redirect("/?owned=1");
 
-  // Don't let someone who already owns lifetime pay a second time. Polar won't
-  // stop a repeat checkout, so we guard here. Fails open (see helper).
-  if (await alreadyOwnsLifetime(userId)) redirect("/?owned=1");
-
-  const base = process.env.NEXT_PUBLIC_POLAR_LIFETIME_CHECKOUT_URL;
+  const base = process.env.NEXT_PUBLIC_POLAR_WAITLIST_CHECKOUT_URL;
   if (!base) {
-    console.error("[claim] NEXT_PUBLIC_POLAR_LIFETIME_CHECKOUT_URL is not set");
+    console.error("[claim] NEXT_PUBLIC_POLAR_WAITLIST_CHECKOUT_URL is not set");
     redirect("/?checkout=unavailable");
   }
 
@@ -56,19 +53,19 @@ export default async function ClaimPage() {
 }
 
 /**
- * Asks the main app whether this Clerk user already has lifetime access, so we
- * never send an existing owner back through checkout.
+ * Asks the main app whether this Clerk user has already joined the paid
+ * waitlist, so we never send an existing member back through checkout.
  *
  * Configured via ENTITLEMENT_CHECK_URL (e.g. https://benderai.app/api/
- * entitlement) and an optional ENTITLEMENT_CHECK_SECRET bearer token. The
+ * waitlist-member) and an optional ENTITLEMENT_CHECK_SECRET bearer token. The
  * endpoint is expected to accept ?clerk_user_id=… and return JSON shaped like
- * { tier: "LIFETIME" | "PRO" | "FREE", lifetime?: boolean }.
+ * { joined: boolean } (also accepts { waitlistMember: boolean }).
  *
  * Fails OPEN on every uncertainty (unset URL, non-200, timeout, bad JSON):
- * blocking a paying customer is far worse than the rare duplicate charge this
+ * blocking a willing payer is worse than the rare duplicate $5 charge this
  * guards against.
  */
-async function alreadyOwnsLifetime(userId: string): Promise<boolean> {
+async function alreadyJoined(userId: string): Promise<boolean> {
   const url = process.env.ENTITLEMENT_CHECK_URL;
   if (!url) return false;
 
@@ -80,8 +77,11 @@ async function alreadyOwnsLifetime(userId: string): Promise<boolean> {
       signal: AbortSignal.timeout(3000),
     });
     if (!res.ok) return false;
-    const data = (await res.json()) as { tier?: string; lifetime?: boolean };
-    return data.lifetime === true || data.tier === "LIFETIME";
+    const data = (await res.json()) as {
+      joined?: boolean;
+      waitlistMember?: boolean;
+    };
+    return data.joined === true || data.waitlistMember === true;
   } catch {
     return false;
   }

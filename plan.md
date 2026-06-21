@@ -1,5 +1,11 @@
 # Bender — Waitlist Page Build Brief (Agent Handoff)
 
+> ⚠️ **OUTDATED (historical build log).** This brief describes the original
+> *$49 lifetime for the first 100* model. As of 2026-06-21 the model is a
+> **$5 paid waitlist** (locks in $12/yr vs $15; no free email list, no spot
+> cap). For the current model see [PRODUCT.md](PRODUCT.md) and
+> [README.md](README.md). Kept only as a record of the initial build.
+
 > **Read this first.** You are building a **waitlist landing page** for an existing SaaS called **Bender**.
 > This document tells you everything about the product, its visual identity, and exactly what the
 > waitlist page must do — so you can build it to match the main app perfectly without needing to
