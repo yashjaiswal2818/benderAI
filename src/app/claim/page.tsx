@@ -18,7 +18,7 @@ export const dynamic = "force-dynamic";
  * post-signup redirect, or a direct hit).
  *
  * We pass two things on the checkout URL so the main app can recognise this
- * person as a paid member later and apply their locked-in yearly price:
+ * person as a paid member later and apply their locked-in monthly price:
  *  - clerk_user_id: prefills the Polar `clerk_user_id` custom field (the
  *    primary, email-agnostic way the buyer is resolved).
  *  - customer_email: prefills the email so the email fallback also resolves.

@@ -30,19 +30,19 @@ const fontMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: "Bender — join the $5 waitlist, lock in $12/yr",
+    default: "Bender — join the waitlist for early access",
     template: "%s | Bender",
   },
   description: siteConfig.description,
   openGraph: {
     type: "website",
     siteName: "Bender",
-    title: "Bender — join the $5 waitlist, lock in $12/yr",
+    title: "Bender — join the waitlist for early access",
     description: siteConfig.description,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Bender — join the $5 waitlist, lock in $12/yr",
+    title: "Bender — join the waitlist for early access",
     description: siteConfig.description,
     creator: "@yashjaiswal28_",
   },

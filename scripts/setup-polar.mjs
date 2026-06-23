@@ -21,9 +21,8 @@ const ENV_PATH = join(dirname(fileURLToPath(import.meta.url)), "..", ".env.local
 
 const PRODUCT_NAME = "Bender — Waitlist";
 const PRODUCT_DESCRIPTION =
-  "One-time $5 fee to join the Bender waitlist. Locks in Bender Pro yearly " +
-  "at $12/year (vs $15) for as long as you stay subscribed. Non-refundable " +
-  "commitment fee, not a deposit.";
+  "One-time $5 fee to join the Bender waitlist for early access to the " +
+  "playground. Non-refundable commitment fee, not a deposit.";
 const PRICE_USD_CENTS = 500;
 
 function loadEnv() {

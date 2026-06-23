@@ -42,7 +42,7 @@ export default async function Page() {
               style={{ "--rise-delay": "40ms" } as React.CSSProperties}
             >
               <span className="h-1.5 w-1.5 rounded-full bg-clay" />
-              V1 launches {siteConfig.launchWindow} · paid waitlist is open
+              V1 launches {siteConfig.launchWindow} · early access is open
             </p>
 
             <h1
@@ -132,12 +132,27 @@ export default async function Page() {
               <div className="border-b border-border-subtle bg-surface px-7 py-4">
                 <p className="flex items-center gap-2 font-mono text-[12px] text-ink-muted">
                   <span className="h-1.5 w-1.5 rounded-full bg-clay" />
-                  Pay to wait. Skip the noise.
+                  Early access · be first in line
                 </p>
               </div>
 
               <div className="px-7 pb-7 pt-6">
-                <div className="flex justify-center">
+                <div className="flex items-baseline gap-2.5">
+                  <span className="font-display text-[3.25rem] font-semibold leading-none tracking-[-0.02em] text-ink">
+                    ${waitlist.joinPrice}
+                  </span>
+                  <span className="text-[15px] font-medium text-ink">once</span>
+                  <span className="text-[13px] font-medium text-ink-muted">
+                    + tax
+                  </span>
+                </div>
+                <p className="mt-2 text-[14px] font-medium leading-[1.55] text-ink-muted">
+                  A one-time fee to join the waitlist and lock in early access to
+                  the Bender playground the day it opens. No free list, no spam
+                  &mdash; just builders who actually want this.
+                </p>
+
+                <div className="mt-7 flex justify-center">
                   <JoinedMeter count={count} />
                 </div>
 
@@ -152,10 +167,8 @@ export default async function Page() {
 
               <div className="border-t border-border-subtle bg-surface px-7 py-3.5">
                 <p className="text-[12px] leading-[1.55] text-ink-muted">
-                  The ${waitlist.joinPrice} is a non-refundable commitment fee, not a
-                  deposit. Yearly includes the full Pro allowance &mdash;{" "}
-                  {waitlist.creditsPerMonth} credits a month, resetting monthly.
-                  Not unlimited.
+                  The ${waitlist.joinPrice} is a non-refundable commitment fee to join
+                  the waitlist, not a deposit.
                 </p>
               </div>
             </div>

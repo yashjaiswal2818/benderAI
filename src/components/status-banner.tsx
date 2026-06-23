@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useClerk } from "@clerk/nextjs";
 import { PartyPopper } from "lucide-react";
-import { siteConfig } from "@/lib/config";
 
 /**
  * Reacts to the query flags the claim flow leaves behind:
@@ -42,8 +41,8 @@ export function StatusBanner() {
             You&rsquo;re on the waitlist.
           </p>
           <p className="mt-0.5 text-[13px] leading-[1.5] text-ink-muted">
-            Your ${siteConfig.waitlist.yearlyMember}/yr price is locked in. We&rsquo;ll
-            email you the moment Bender opens, about a week from now.
+            Early access secured. We&rsquo;ll email you the moment Bender opens,
+            about a week from now.
           </p>
         </div>
       </div>

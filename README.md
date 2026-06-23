@@ -5,8 +5,9 @@ plain-English prompt into production React Native mobile screens.
 
 The model: **$5 once to join the waitlist.** It's a non-refundable commitment
 fee (not a deposit) — paying is the signal of genuine intent, so there's no
-free email list. In return, members lock in Bender Pro yearly at **$12/yr**
-(vs **$15** for everyone else) at launch.
+free email list. In return, members get **early access to the Bender
+playground** when it opens. (Subscription pricing is still TBD — not shown on
+the page yet.)
 
 Built with Next.js 16 (App Router), React 19, Tailwind v4, `motion`,
 `@number-flow/react`, and `lucide-react`. Auth is Clerk; payment is Polar.
@@ -44,13 +45,13 @@ npm run dev                  # http://localhost:3000
    the number always reads as real.
 
 Pricing and copy knobs all live in `siteConfig.waitlist` in
-[`src/lib/config.ts`](src/lib/config.ts): `joinPrice`, `yearlyNormal`,
-`yearlyMember`, `joinedManual`, `creditsPerMonth`.
+[`src/lib/config.ts`](src/lib/config.ts): `joinPrice`, `monthlyNormal`,
+`monthlyMember`, `joinedManual`, `creditsPerMonth`.
 
 > **Discount enforcement is the main app's job.** This site collects the $5 and
 > ties it to a `clerk_user_id` (+ email) via Polar. At launch, the main app
-> must read who paid and apply the $12/yr price. This repo only makes the
-> promise; it can't enforce pricing.
+> must read who paid and grant their early-access benefit. This repo only
+> records the membership; it doesn't fulfil it.
 
 ## Structure
 

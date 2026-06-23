@@ -6,19 +6,19 @@ export const siteConfig = {
 
   // ── The paid waitlist ───────────────────────────────────────────────
   // $5 once to join. Non-refundable commitment fee — not credited toward the
-  // subscription. The reward is a permanently lower yearly price at launch.
+  // subscription. The reward is a permanently lower monthly price at launch.
   waitlist: {
     joinPrice: 5,
-    // Yearly plan pricing at launch. Members lock in `yearlyMember` for good;
-    // everyone else pays `yearlyNormal`.
-    yearlyNormal: 15,
-    yearlyMember: 12,
+    // Monthly plan price (USD/month). NOT shown on the page yet — subscription
+    // pricing is undecided. Kept for when the early-access discount is finalised.
+    monthlyNormal: 15,
+    monthlyMember: 12,
     // Manual fallback for the live "X joined" counter. Used only when Polar
     // isn't configured (POLAR_ACCESS_TOKEN + POLAR_WAITLIST_PRODUCT_ID).
     // Update by hand so the number always reads as real.
     joinedManual: 11,
-    // 500 credits/month, resets monthly — the Pro allowance the yearly plan
-    // includes. Never describe it as "unlimited".
+    // 500 credits/month, resets monthly — the Pro allowance the plan includes.
+    // Never describe it as "unlimited".
     creditsPerMonth: 500,
   },
 

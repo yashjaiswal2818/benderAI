@@ -18,8 +18,9 @@ generated with the parts people normally skip: loading, empty, error, and dark
 states, themed to the user's own tokens. This site is the pre-launch *paid*
 waitlist: its job is to make a visitor understand what Bender does (by showing
 real output, not claiming), then convert them into a paying waitlist member —
-$5 once to join, which locks in a permanently cheaper yearly price ($12/yr vs
-$15) at launch. No free email list: paying $5 is the signal of genuine intent.
+$5 once to join, for early access to the Bender playground when it opens.
+Subscription pricing is still TBD. No free email list: paying $5 is the signal
+of genuine intent.
 
 ## Brand Personality
 
